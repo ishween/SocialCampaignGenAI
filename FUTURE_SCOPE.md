@@ -4,10 +4,6 @@
 **Date:** 2026-04-23
 **Status:** Active
 
-Items deliberately deferred from the POC to keep scope and cost bounded. Each is production-relevant but not required to demonstrate the core value proposition.
-
----
-
 ## 1. Persistent LangGraph Checkpointing
 
 **What it is:** Replacing the in-process `MemorySaver` checkpointer in `src/generation/quality_loop.py` with `SqliteSaver` for single-machine deployments or `PostgresSaver` for distributed workers.
