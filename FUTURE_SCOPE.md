@@ -38,16 +38,6 @@ Items deliberately deferred from the POC to keep scope and cost bounded. Each is
 
 ---
 
-## 4. Multi-Language and Region Support
-
-**What it is:** Uncommenting the FR region entries in the campaign YAML files and extending the pipeline to additional locales.
-
-**Why it matters:** Enterprise campaigns routinely run across multiple markets with different languages, cultural references, and legal requirements around advertising copy. The `message_override` field per `RegionConfig` already supports per-region text in the data model, and Gemini handles multilingual overlay text natively. The FR configuration is already written in the YAML files - it is commented out only because POC evaluation was conducted in English.
-
-**What is needed:** Uncomment FR entries in `config/poc_campaign.yaml` and `config/test_existing_asset.yaml`. For production expansion to RTL languages (Arabic, Hebrew), the PIL fallback overlay needs text alignment flipped. Font files may also need to be extended to cover full Unicode ranges - Noto Sans is the recommended universal fallback.
-
----
-
 ## 5. Human-in-the-Loop Checkpoint
 
 **What it is:** Adding a LangGraph `interrupt_before=["refine_prompt"]` at graph compile time, pausing the quality loop after evaluation so a creative director can review the score, see the generated image, and approve or override the refinement direction before the loop continues.
@@ -70,21 +60,21 @@ Items deliberately deferred from the POC to keep scope and cost bounded. Each is
 
 ## 7. Production Architecture
 
-**What it is:** Replacing the sequential single-user CLI with a FastAPI service layer, a Celery task queue backed by Redis as the broker, Kubernetes workers processing campaigns in parallel, S3 or GCS object storage for output assets, and webhook or email notifications on job completion.
+**What it is:** Replacing the sequential single-user CLI with a FastAPI service layer, a task queue backed by Redis as the broker, Kubernetes workers processing campaigns in parallel, S3 or GCS object storage for output assets, and webhook or email notifications on job completion.
 
 **Why it matters:** The CLI processes one product at a time and writes to the local filesystem. At the expected production volume of 250 campaigns per month generating up to 55 GB of output, this is neither concurrent nor durable. Production requires multiple campaigns to run simultaneously, output to persist independently of the machine running the pipeline, and creative teams to receive completion notifications without polling a terminal. The Kubernetes worker model assigns disjoint product subsets to each pod, eliminating concurrent write conflicts without distributed locking.
 
-**What is needed:** Wrap the pipeline runner in a FastAPI endpoint that accepts a campaign brief and returns a job ID. Submit jobs to Celery via Redis. Deploy workers as Kubernetes pods with resource limits. Write outputs to S3 or GCS using the same `output/{product}/{region}/{ratio}.png` path convention. Send webhook callbacks or email notifications on job completion. This architecture is documented in `01_ARCHITECTURE_DECISIONS.md`.
+**What is needed:** Wrap the pipeline runner in a FastAPI endpoint that accepts a campaign brief and returns a job ID. Submit jobs to queue via Redis. Deploy workers as Kubernetes pods with resource limits. Write outputs to S3 or GCS using the same `output/{product}/{region}/{ratio}.png` path convention. Send webhook callbacks or email notifications on job completion. This architecture is documented in `01_ARCHITECTURE_DECISIONS.md`.
 
 ---
 
 ## 8. Observability
 
-**What it is:** Structured JSON log emission via `python-json-logger`, OpenTelemetry spans per creative, and metrics pushed to Datadog or CloudWatch covering per-creative latency, compliance pass rate, cost per asset, and quality score trends.
+**What it is:** OpenTelemetry spans per creative, and metrics pushed to Datadog or CloudWatch covering per-creative latency, compliance pass rate, cost per asset, and quality score trends.
 
-**Why it matters:** The current logger (`src/utils/logger.py`) emits human-readable text to stdout and a log file. This is sufficient for a single user debugging a single run, but it is not machine-queryable. Production needs alerting when quality scores degrade (indicating a model change or prompt drift), when compliance pass rates drop (indicating a brand config issue), or when per-asset costs spike (indicating retry storms or quality loop overruns). None of these alerts are possible without structured, searchable logs and a metrics backend.
+**Why it matters:** Production needs alerting when quality scores degrade (indicating a model change or prompt drift), when compliance pass rates drop (indicating a brand config issue), or when per-asset costs spike (indicating retry storms or quality loop overruns). None of these alerts are possible without structured, searchable logs and a metrics backend.
 
-**What is needed:** Add `python-json-logger` to requirements and configure it as the log formatter. Wrap each phase (generation, resize, overlay, compliance) in an OpenTelemetry span. Emit cost and quality score as custom metrics. Configure Datadog or CloudWatch dashboards and alerts on the key signals. The `PhaseTimer` and `fmt_duration` utilities in `logger.py` already collect timing data - they need only to emit it as structured fields rather than formatted strings.
+**What is needed:** Wrap each phase (generation, resize, overlay, compliance) in an OpenTelemetry span. Emit cost and quality score as custom metrics. Configure Datadog or CloudWatch dashboards and alerts on the key signals. The `PhaseTimer` and `fmt_duration` utilities in `logger.py` already collect timing data - they need only to emit it as structured fields rather than formatted strings.
 
 ---
 
@@ -105,17 +95,4 @@ Items deliberately deferred from the POC to keep scope and cost bounded. Each is
 **Why it matters:** Users want to check YAML correctness before committing to a pipeline run that consumes API credits. Currently, a malformed YAML is caught at startup before any API calls, but there is no easy way to test a new brief without triggering the full pipeline. A validate-only mode costs nothing and gives the creative operations team confidence before scheduling a campaign run.
 
 **What is needed:** Add `--validate-only` to the CLI argument parser. Route it to a function that runs only the config loading, Pydantic validation, and input security classification steps, then exits with code 0 on success or code 1 with field-level error messages on failure. No image generation or file I/O.
-
 ---
-
-## 11. DAM Integration
-
-**What it is:** Pushing completed output assets directly to a Digital Asset Management system - Adobe Experience Manager, Bynder, or Cloudinary - immediately after each asset passes compliance and is saved to disk.
-
-**Why it matters:** Currently, assets land on the local filesystem and must be manually uploaded to the DAM before creative teams can access them for campaign assembly and approval workflows. This handoff step is manual, error-prone, and introduces delay. Enterprise creative teams use DAMs as their single source of truth, assets that do not appear in the DAM do not exist from the team's perspective.
-
-**What is needed:** Add a DAM upload step at the end of each per-ratio save in `runner.py`. Abstract behind a `DAMClient` interface so that AEM, Bynder, and Cloudinary implementations can be swapped via config. Pass the DAM API credentials via environment variables. Record the DAM asset URL in the per-asset metadata alongside the local path.
-
----
-
-*This document should be updated as scope decisions are revisited and items move from future scope into active development.*
