@@ -205,10 +205,6 @@ Prompts are model-specific and assembled in `src/generation/prompt_builder.py`. 
 
 Prompt templates are stored in `src/config/prompts.yaml` and versioned alongside the codebase. Each generated asset records the prompt version in its metadata for reproducibility and audit.
 
-### 4.3 Seed Management
-
-Seed management means using a fixed numeric seed when calling the image generation API so that the same prompt reliably produces the same image. In the POC, a random seed is used and logged per asset. In production, the seed should be derived deterministically from `hash(product + region + campaign_id)` so that any re-run of the same brief produces identical output, which is essential for auditability and detecting when a brief change has actually changed the output.
-
 ### 4.4 Future Scope: Prompt Gateway
 
 The current prompt is built programmatically from a fixed template. At enterprise scale this becomes a limiting pattern:
@@ -249,11 +245,9 @@ After the image is generated and campaign text is added, `src/compliance/checker
 
 - **Semantic brand alignment:** Addressed by the LangGraph quality loop. Gemini 3 Flash scores each generated image on brand alignment (0–5) before composition. This is LLM-as-judge, already implemented.
 
-- **CLIP score:** CLIP measures cosine similarity between image and text embeddings using a shared encoder (e.g., OpenAI CLIP, OpenCLIP). Calculating it requires direct access to a CLIP model's weights, either a local open-source model or a self-hosted instance. The Gemini API does not expose embeddings in a format compatible with standard CLIP evaluation. If added to the production evaluation pipeline, CLIP would run locally against saved output images using an open-source model (e.g., `openai/clip-vit-base-patch32`), not via the Gemini API. Added to production roadmap.
-
 - **Accessibility:** Alt-text generation is not implemented in the POC.
 
-- **Legal review:** Product depictions in regulated industries (pharmaceuticals, financial services, alcohol) require human legal sign-off. A production extension would flag the asset, send a notification (email, Slack webhook, or ticketing system), and persist the pipeline state. On approval or rejection received via webhook, the pipeline resumes, accepting the asset or discarding it. This follows the same pattern as the LangGraph human-in-the-loop checkpoint already scoped in `FUTURE_SCOPE.md §5`.
+- **Legal review:** Product depictions in regulated industries (pharmaceuticals, financial services, alcohol) require human legal sign-off. A production extension would flag the asset, send a notification (email, Slack webhook, or ticketing system), and persist the pipeline state. On approval or rejection received via webhook, the pipeline resumes, accepting the asset or discarding it. This follows the same pattern as the LangGraph human-in-the-loop checkpoint already scoped in `FUTURE_SCOPE.md`.
 
 ---
 
@@ -265,10 +259,9 @@ The fault-tolerance mechanisms below are all implemented. See the `README.md` Fa
 
 **Future scope (not implemented). See `FUTURE_SCOPE.md` for details:**
 
-- Retry with exponential backoff for transient API errors (`tenacity` on all API-calling functions)
+- Timeout, Retry with exponential backoff for transient API errors (`tenacity` on all API-calling functions)
 - `SqliteSaver` / `PostgresSaver` for cross-process LangGraph checkpointing (current `MemorySaver` does not survive process kills)
 - Circuit breaker for cascading API failures across multiple products
-- Atomic file writes (`os.rename` from temp path to final path, preventing partial PNG on crash)
 - Provider-side prompt caching to reduce token cost for repeated system prompts
 
 ### 6.2 Retry Strategy
