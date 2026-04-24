@@ -78,9 +78,6 @@ Brand alignment, composition quality, and product accuracy are semantic concepts
 ### Why deterministic checks for compliance
 Brand compliance must be auditable and reproducible. "Does this image contain a prohibited word?" must always give the same answer for the same input. An LLM answer to this question varies by temperature and phrasing. Regex is 100% deterministic, zero cost, and produces an exact match list. Logo detection via template match is explainable: here is the confidence score, here is the region where the match was found.
 
-### Why not CLIP score
-CLIP measures cosine similarity between the image embedding and the prompt text. It answers "does the image look like the prompt?" not "does the image match the brand brief?" A photorealistic image of a competitor's product would score high on CLIP if the prompt mentioned the product category. CLIP is a useful complementary signal but does not replace brand-aware scoring. Added to the production roadmap, not implemented in POC.
-
 ### Why not human-only evaluation
 At 250 campaigns/month × 3 ratios × 5 products = 3,750 images/month, human review of every generated image at the generation stage is not viable. The quality loop automates the generation-time filter. Human review is reserved for the 10% weekly sample and for assets flagged after max attempts - where human judgment adds the most value.
 
