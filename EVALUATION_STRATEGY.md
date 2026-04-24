@@ -93,7 +93,7 @@ Escalation triggers:
 | Compliance pass rate | N/A | ≥ 90% | assets_compliant ÷ assets_generated |
 | Human eval avg score | N/A | ≥ 3.5 / 5.0 | Weekly rubric aggregation |
 
-**Decision point:** If the POC demonstrates ≥ 12× efficiency gain and ≥ 90% compliance pass rate sustained over four weeks, proceed to production architecture planning as documented in `01_ARCHITECTURE_DECISIONS.md` and `FUTURE_SCOPE.md`.
+**Decision point:** If the POC demonstrates ≥ 12× efficiency gain and ≥ 90% compliance pass rate sustained over four weeks, proceed to production architecture planning as documented in `FUTURE_SCOPE.md`.
 
 ---
 
@@ -112,7 +112,3 @@ Escalation triggers:
 - Tier 2 human eval: ≥ 3.5 weighted average score sustained over four weeks
 - Tier 2 human eval: ≥ 85% pass rate sustained over four weeks
 - Compliance: ≥ 90% pass rate sustained over four weeks
-
----
-
-*This strategy is a living document. Update pass thresholds and rubric criteria based on the first 30 days of production data.*
