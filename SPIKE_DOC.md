@@ -36,17 +36,7 @@ Creative teams at enterprise customers are bottlenecked on asset production. Gen
 
 ---
 
-### 1.4 What Are DAMs?
-
-A **Digital Asset Management (DAM)** system is the centralized platform where enterprises store, organize, retrieve, and distribute creative assets, including images, videos, copy, and brand guidelines. Campaign-ready assets live in the DAM. Downstream teams (social, paid media, web) pull directly from it for campaign assembly.
-
-Examples: Adobe Experience Manager (AEM), Bynder, Cloudinary.
-
-Currently the pipeline writes to the local filesystem (`output/{product}/{region}/{ratio}.png`) as a proxy for DAM delivery. In production, the final step after compliance passes would push the asset to the DAM via API, making it immediately available without a manual upload handoff. See `FUTURE_SCOPE.md §11` for the integration design.
-
----
-
-### 1.5 Scoping Questions and Answers
+### 1.4 Scoping Questions and Answers
 
 | Question | Answer | Implication |
 |---|---|---|
@@ -57,7 +47,7 @@ Currently the pipeline writes to the local filesystem (`output/{product}/{region
 | Who are the users? | 5-20 creative team members | No multi-tenancy required at POC scale |
 | What is acceptable end-to-end latency? | 5-10 min for a full batch campaign | Async/queue not required for POC |
 | What notification mechanism is needed? | CLI output in POC | Webhooks or email in production |
-| What availability SLA is expected? | Best-effort for POC, **99.5%** for production | Appropriate for a batch creative tool where campaigns are planned days in advance and the system is not customer-facing real-time |
+| What availability SLA is expected? | Best-effort for POC, 99.5% for production | Appropriate for a batch creative tool where campaigns are planned days in advance and the system is not customer-facing real-time |
 | Does the pipeline need to be idempotent? | Yes. Re-runs should not regenerate existing assets. | Asset existence check is a first-class requirement |
 | What happens when an image is off-brand? | Fail fast with clear error. Do not overwrite reviewed assets. | Compliance check gates file write |
 
@@ -76,7 +66,7 @@ Currently the pipeline writes to the local filesystem (`output/{product}/{region
 **Total per campaign (worst case):** 5 products × 3 regions × 3 ratios × 5 MB = 225 MB output
 **Monthly storage requirement:** 250 campaigns × 225 MB = ~55 GB uncompressed. JPEG/WebP would reduce this by 3-5x.
 
-**Decision:** PNG is used in POC for lossless quality during review. Production pipeline should add a JPEG/WebP conversion step before delivery to downstream DAMs.
+**Decision:** PNG is used in POC for lossless quality during review. Production pipeline should add a JPEG/WebP conversion step before delivery.
 
 ### 2.2 User Scale Assumptions
 
@@ -263,7 +253,7 @@ After the image is generated and campaign text is added, `src/compliance/checker
 
 - **Accessibility:** Alt-text generation is not implemented in the POC.
 
-- **Legal review:** Product depictions in regulated industries (pharmaceuticals, financial services, alcohol) require human legal sign-off. A production extension would flag the asset, send a notification (email, Slack webhook, or ticketing system), and persist the pipeline state. On approval or rejection received via webhook, the pipeline resumes, accepting the asset to the DAM or discarding it. This follows the same pattern as the LangGraph human-in-the-loop checkpoint already scoped in `FUTURE_SCOPE.md §5`.
+- **Legal review:** Product depictions in regulated industries (pharmaceuticals, financial services, alcohol) require human legal sign-off. A production extension would flag the asset, send a notification (email, Slack webhook, or ticketing system), and persist the pipeline state. On approval or rejection received via webhook, the pipeline resumes, accepting the asset or discarding it. This follows the same pattern as the LangGraph human-in-the-loop checkpoint already scoped in `FUTURE_SCOPE.md §5`.
 
 ---
 
@@ -349,7 +339,6 @@ The following table covers both the capability gaps (what is needed to go from P
 | Async job status | None | REST API + polling or WebSocket push |
 | Notifications | CLI stdout | Webhooks, email, Slack integration |
 | Multi-tenancy | None | Per-tenant isolation, role-based access control |
-| DAM integration | Local filesystem | Adobe Experience Manager / Bynder / Cloudinary API push after compliance |
 | Infrastructure | Local filesystem | Object storage (AWS S3 / GCS) with lifecycle policies + CDN |
 | High availability | Best-effort | Multi-region workers, auto-scaling |
 | Observability | Local log file | OpenTelemetry spans per creative, Datadog / Grafana dashboards |
