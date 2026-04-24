@@ -1,0 +1,33 @@
+# Quick test: existing asset only — no image generation API calls.
+# Exercises: smart focal crop, smart placement, brand overlay, compliance, JSON report.
+#
+# Run: python src/main.py --brief config/test_existing_asset.yaml
+
+name: "HydraFresh Existing Asset Test"
+message: "Stay Fresh. Stay Hydrated."
+target_audience: "Health-conscious adults aged 25-40 who lead active lifestyles"
+brand_style: "vibrant, energetic, outdoor lifestyle, clean and modern"
+
+products:
+  - name: "Hydrate+"
+    description: "Performance electrolytes and recovery support, lemon lime flavor"
+    existing_asset: "assets/input/Hydrate.png"
+    style_keywords:
+      - "clean"
+      - "lifestyle"
+      - "kitchen counter"
+
+regions:
+  - code: "US"
+    language: "en"
+    locale_name: "United States"
+
+aspect_ratios:
+  - "1:1"
+  - "9:16"
+  - "16:9"
+
+prohibited_words:
+  - "guaranteed"
+  - "cure"
+  - "miracle"

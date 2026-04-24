@@ -1,0 +1,64 @@
+# POC Campaign — demonstrates both pipeline paths in one run:
+#
+#  Product 1: Hydrate+   existing_asset → resize + smart overlay (0 API generation calls)
+#  Product 2: HydraFresh Sport Bottle   → Imagen 4 generates 1 base image (1 API call)
+#                                          then resize × 3 ratios, overlay × 2 languages
+#
+# Total Imagen 4 calls: 1  (well within 70/day paid tier limit)
+# Total Gemini calls:   ~10 (validation + focal point + 3 placements × 2 products + eval loop)
+#
+# Run: python src/main.py --brief config/poc_campaign.yaml --generator imagen
+
+name: "HydraFresh Summer Campaign"
+message: "Stay Fresh. Stay Hydrated."
+target_audience: "Health-conscious adults aged 25-40 who lead active lifestyles"
+brand_style: "vibrant, energetic, sports lifestyle photography, electric highlights, cinematic"
+
+products:
+  # ── Product 1: Existing asset (Fathom Nutrition Hydrate+ photo) ─────────────
+  - name: "Hydrate+"
+    description: "Performance electrolytes and recovery support, 20-packet standing pouch, lemon lime flavor"
+    existing_asset: "assets/input/Hydrate.png"   # real product photo — skip generation
+    style_keywords:
+      - "clean"
+      - "lifestyle"
+      - "kitchen counter"
+    # label_text omitted — existing photo already has Fathom Nutrition branding
+    # background_scene omitted — existing photo already has kitchen background
+
+  # ── Product 2: Generate new asset with Imagen 4 ─────────────────────────────
+  - name: "HydraFresh Sport Bottle"
+    description: "Sleek 32oz BPA-free double-wall insulated stainless steel water bottle, matte finish, leak-proof lid, premium athletic design"
+    existing_asset: null   # → triggers LangGraph quality loop → Imagen 4
+    style_keywords:
+      - "premium steel"
+      - "athletic"
+      - "dynamic"
+      - "cinematic"
+    label_text: "HydraFresh\nSport\n32 oz\nDouble-Wall Insulated\nLeak-Proof"
+    background_scene: >
+      dynamic sports stadium at dusk, basketball player mid-dunk and soccer player
+      kicking in the background, crowd cheering, dramatic floodlights, electric blue
+      energy swirls around the bottle, water droplets frozen mid-air, cinematic depth
+      of field, product as hero in foreground sharp and bold
+
+regions:
+  - code: "US"
+    language: "en"
+    locale_name: "United States"
+  - code: "FR"
+    language: "fr"
+    locale_name: "France"
+    # message_override: "Restez Frais. Restez Hydraté."
+
+aspect_ratios:
+  - "1:1"    # Instagram Feed, Facebook Feed
+  - "9:16"   # Instagram Stories, TikTok
+  - "16:9"   # YouTube Thumbnail, Twitter Header
+
+prohibited_words:
+  - "guaranteed"
+  - "cure"
+  - "miracle"
+  - "best in the world"
+  - "free"

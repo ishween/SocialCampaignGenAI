@@ -1,0 +1,40 @@
+# Test: image generation only — no existing asset loaded.
+# Exercises: LangGraph quality loop → Imagen 4 → resize → LLM overlay → compliance.
+#
+# Run: python src/main.py --brief config/test_generate_asset.yaml --generator imagen
+
+name: "HydraFresh Generation Test"
+message: "Stay Fresh. Stay Hydrated."
+target_audience: "Health-conscious adults aged 25-40 who lead active lifestyles"
+brand_style: "vibrant, energetic, sports lifestyle photography, electric highlights, cinematic"
+
+products:
+  - name: "HydraFresh Sport Bottle"
+    description: "Sleek 32oz BPA-free double-wall insulated stainless steel water bottle, matte finish, leak-proof lid, premium athletic design"
+    existing_asset: null
+    style_keywords:
+      - "premium steel"
+      - "athletic"
+      - "dynamic"
+      - "cinematic"
+    label_text: "HydraFresh\nSport\n32 oz\nDouble-Wall Insulated\nLeak-Proof"
+    background_scene: >
+      dynamic sports stadium at dusk, basketball player mid-dunk and soccer player
+      kicking in the background, crowd cheering, dramatic floodlights, electric blue
+      energy swirls around the bottle, water droplets frozen mid-air, cinematic depth
+      of field, product as hero in foreground sharp and bold
+
+regions:
+  - code: "US"
+    language: "en"
+    locale_name: "United States"
+
+aspect_ratios:
+  - "1:1"
+  - "9:16"
+  - "16:9"
+
+prohibited_words:
+  - "guaranteed"
+  - "cure"
+  - "miracle"

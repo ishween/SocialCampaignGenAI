@@ -1,0 +1,60 @@
+# Demo campaign — uses existing product images so the full pipeline runs
+# without a paid image generation API tier.
+#
+# label_text:       Text the image model renders ON the product label (generation only).
+#                   Ignored for existing_asset — the real photo already has its branding.
+# background_scene: Lifestyle context for generated images (ignored for existing_asset).
+#
+# Step 1: python scripts/create_test_assets.py
+# Step 2: python src/main.py --brief config/demo_campaign.yaml
+
+name: "Summer Hydration 2025"
+message: "Stay Fresh. Stay Hydrated."
+target_audience: "Health-conscious adults aged 25-40 who lead active lifestyles"
+brand_style: "vibrant, energetic, outdoor lifestyle, clean and modern"
+
+products:
+  - name: "Sport Water Bottle"
+    description: "Sleek 32oz BPA-free stainless steel water bottle with leak-proof lid, ideal for outdoor sports and gym use"
+    existing_asset: "assets/input/sport_water_bottle.png"
+    style_keywords:
+      - "minimalist"
+      - "athletic"
+      - "outdoor"
+    label_text: "HydraFresh\nSport\n32 oz  ·  BPA Free\nDouble-Wall Insulated"
+    background_scene: >
+      dynamic sports stadium at dusk, basketball player mid-dunk, runners on track,
+      crowd cheering, dramatic floodlights, electric blue energy swirls, cinematic depth of field
+
+  - name: "Electrolyte Powder"
+    description: "Colorful single-serve electrolyte powder packets in tropical flavors, healthy and sugar-free"
+    existing_asset: "assets/input/electrolyte_powder.png"
+    style_keywords:
+      - "vibrant colors"
+      - "health wellness"
+      - "tropical"
+    label_text: "HydraFresh\nHydrate+\nPerformance Electrolytes\n610mg  ·  Zero Sugar\nLemon Lime"
+    background_scene: >
+      bright outdoor running trail at golden hour, athlete mid-sprint blurred in background,
+      product on rocky surface with condensation, sun rays through trees, high energy lifestyle
+
+regions:
+  - code: "US"
+    language: "en"
+    locale_name: "United States"
+  - code: "FR"
+    language: "fr"
+    locale_name: "France"
+    message_override: "Restez Frais. Restez Hydraté."
+
+aspect_ratios:
+  - "1:1"    # Instagram Feed, Facebook Feed
+  - "9:16"   # Instagram Stories, TikTok
+  - "16:9"   # YouTube Thumbnail, Twitter Header
+
+prohibited_words:
+  - "guaranteed"
+  - "cure"
+  - "miracle"
+  - "best in the world"
+  - "free"

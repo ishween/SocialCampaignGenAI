@@ -1,0 +1,2 @@
+image_id,product,region,aspect_ratio,brand_alignment,product_accuracy,composition,relevance,overall,reviewer,comments
+img_001,,,,,,,,,,"Rate 1-5: brand_alignment=on-brand, product_accuracy=recognizable, composition=clean, relevance=captures brief"

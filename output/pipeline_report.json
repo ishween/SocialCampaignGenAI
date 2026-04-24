@@ -1,0 +1,181 @@
+{
+  "campaign": "HydraFresh Summer Campaign",
+  "summary": {
+    "total_assets": 12,
+    "generated": 6,
+    "reused": 6,
+    "failed": 0,
+    "duration": "10m 51.8s",
+    "duration_sec": 651.8
+  },
+  "assets": [
+    {
+      "product": "Hydrate+",
+      "region": "US",
+      "aspect_ratio": "16:9",
+      "output": "output/hydrate+/us/16x9.png",
+      "source": "reused",
+      "skipped_idempotent": true,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "0.0s",
+      "duration_sec": 0.03
+    },
+    {
+      "product": "Hydrate+",
+      "region": "US",
+      "aspect_ratio": "9:16",
+      "output": "output/hydrate+/us/9x16.png",
+      "source": "reused",
+      "skipped_idempotent": true,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "0.0s",
+      "duration_sec": 0.03
+    },
+    {
+      "product": "Hydrate+",
+      "region": "US",
+      "aspect_ratio": "1:1",
+      "output": "output/hydrate+/us/1x1.png",
+      "source": "reused",
+      "skipped_idempotent": true,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "0.0s",
+      "duration_sec": 0.03
+    },
+    {
+      "product": "Hydrate+",
+      "region": "FR",
+      "aspect_ratio": "1:1",
+      "output": "output/hydrate+/fr/1x1.png",
+      "source": "reused",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "28.6s",
+      "duration_sec": 28.61
+    },
+    {
+      "product": "Hydrate+",
+      "region": "FR",
+      "aspect_ratio": "16:9",
+      "output": "output/hydrate+/fr/16x9.png",
+      "source": "reused",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "2m 17.0s",
+      "duration_sec": 137.03
+    },
+    {
+      "product": "Hydrate+",
+      "region": "FR",
+      "aspect_ratio": "9:16",
+      "output": "output/hydrate+/fr/9x16.png",
+      "source": "reused",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "2m 17.4s",
+      "duration_sec": 137.41
+    },
+    {
+      "product": "HydraFresh Sport Bottle",
+      "region": "US",
+      "aspect_ratio": "16:9",
+      "output": "output/hydrafresh_sport_bottle/us/16x9.png",
+      "source": "generated",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "19.2s",
+      "duration_sec": 19.25
+    },
+    {
+      "product": "HydraFresh Sport Bottle",
+      "region": "US",
+      "aspect_ratio": "9:16",
+      "output": "output/hydrafresh_sport_bottle/us/9x16.png",
+      "source": "generated",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "20.7s",
+      "duration_sec": 20.74
+    },
+    {
+      "product": "HydraFresh Sport Bottle",
+      "region": "US",
+      "aspect_ratio": "1:1",
+      "output": "output/hydrafresh_sport_bottle/us/1x1.png",
+      "source": "generated",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "5m 25.4s",
+      "duration_sec": 325.44
+    },
+    {
+      "product": "HydraFresh Sport Bottle",
+      "region": "FR",
+      "aspect_ratio": "16:9",
+      "output": "output/hydrafresh_sport_bottle/fr/16x9.png",
+      "source": "generated",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "18.2s",
+      "duration_sec": 18.18
+    },
+    {
+      "product": "HydraFresh Sport Bottle",
+      "region": "FR",
+      "aspect_ratio": "9:16",
+      "output": "output/hydrafresh_sport_bottle/fr/9x16.png",
+      "source": "generated",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "52.8s",
+      "duration_sec": 52.79
+    },
+    {
+      "product": "HydraFresh Sport Bottle",
+      "region": "FR",
+      "aspect_ratio": "1:1",
+      "output": "output/hydrafresh_sport_bottle/fr/1x1.png",
+      "source": "generated",
+      "skipped_idempotent": false,
+      "compliance_passed": true,
+      "compliance_warnings": [
+        "Brand colors not detected in image"
+      ],
+      "duration": "1m 14.4s",
+      "duration_sec": 74.43
+    }
+  ]
+}

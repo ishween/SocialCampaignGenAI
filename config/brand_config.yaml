@@ -1,0 +1,23 @@
+# Brand Configuration
+# Configure once per brand; referenced by all campaigns
+
+name: "HydraFresh"
+
+# Path to PNG logo with transparency (relative to project root)
+logo_path: "assets/brand/logos/hydrafresh_logo.png"
+
+# Brand color palette (hex codes)
+primary_colors:
+  - "#00A8E8"   # HydraFresh Blue
+  - "#00CC66"   # HydraFresh Green
+  - "#FFFFFF"   # White
+
+# Typography
+# font_path: "assets/brand/fonts/HydraFresh-Bold.ttf"
+font_path: null   # Uses system Helvetica or DejaVu fallback
+
+font_size_base: 52   # Scaled proportionally per image height
+
+# Text appearance
+text_color: "#FFFFFF"
+text_shadow: true    # Shadow for readability over any background

@@ -1,0 +1,23 @@
+# Core
+pillow>=10.0.0
+pydantic>=2.0.0
+pyyaml>=6.0
+requests>=2.31.0
+
+# GenAI orchestration (LangGraph quality loop)
+langgraph>=0.2.0
+
+# Google AI — single API key, three models for three tasks:
+#   Imagen 3              → image generation   (src/generation/imagen.py)
+#   Gemini 2.0 Flash      → image evaluation   (src/generation/evaluator.py)
+#   Gemini 2.0 Flash-Lite → text tasks         (src/generation/prompt_refiner.py,
+#                                               src/security/input_validator.py)
+google-genai>=1.0.0
+
+# DALL-E 3: retained for extensibility (see src/generation/dalle.py + factory.py)
+# Only needed if explicitly using --generator dalle
+# openai>=1.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-mock>=3.11.0
