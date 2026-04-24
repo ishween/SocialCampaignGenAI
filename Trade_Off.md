@@ -45,10 +45,10 @@ Run deterministic regex blocklist first, then Gemini 3.1 Flash Lite binary class
 
 ### Why both layers are needed
 
-**Layer 1 — Regex (always runs, zero cost)**
+**Layer 1 - Regex (always runs, zero cost)**
 Catches known injection signatures instantly: `ignore previous instructions`, `jailbreak`, `act as a`, `developer mode`, etc. These are fixed patterns that do not require reasoning to detect. Fast, deterministic, auditable. Does not require an API call.
 
-**Layer 2 — LLM Classifier (runs only when Layer 1 passes)**
+**Layer 2 - LLM Classifier (runs only when Layer 1 passes)**
 Novel and obfuscated attacks bypass regex: a subtle override embedded in a plausible-looking product description, a prompt that restructures itself mid-sentence, or a multi-step indirect injection. The LLM classifier reasons over intent and context, not just surface patterns. Catches what regex cannot.
 
 ### Why not LLM only
@@ -62,18 +62,18 @@ Layer 2 is **never called if Layer 1 finds a violation**. This ensures a malicio
 
 ---
 
-## 3. Evaluation Design — LLM-as-Judge + Deterministic Compliance
+## 3. Evaluation Design - LLM-as-Judge + Deterministic Compliance
 
 ### Decision
 Split evaluation into two distinct mechanisms with different purposes.
 
 | Mechanism | What it evaluates | Method | When it runs |
 |---|---|---|---|
-| LangGraph quality loop | Response quality — does the generated image match the brand brief, product identity, and visual style? | Gemini 3 Flash scores 0–5 against brand criteria | During generation, before composition |
-| Compliance checker | Brand rule adherence — logo present, brand colors in palette, no prohibited words | Deterministic: template match, histogram comparison, regex | After composition, before save |
+| LangGraph quality loop | Response quality - does the generated image match the brand brief, product identity, and visual style? | Gemini 3 Flash scores 0–5 against brand criteria | During generation, before composition |
+| Compliance checker | Brand rule adherence - logo present, brand colors in palette, no prohibited words | Deterministic: template match, histogram comparison, regex | After composition, before save |
 
 ### Why LLM-as-judge for quality
-Brand alignment, composition quality, and product accuracy are semantic concepts that cannot be encoded as rules. "Does this image feel like a premium athletic brand?" requires visual reasoning. Gemini 3 Flash scores images against a structured rubric — the same rubric a human creative director would use — and provides natural-language feedback that drives prompt refinement.
+Brand alignment, composition quality, and product accuracy are semantic concepts that cannot be encoded as rules. "Does this image feel like a premium athletic brand?" requires visual reasoning. Gemini 3 Flash scores images against a structured rubric - the same rubric a human creative director would use - and provides natural-language feedback that drives prompt refinement.
 
 ### Why deterministic checks for compliance
 Brand compliance must be auditable and reproducible. "Does this image contain a prohibited word?" must always give the same answer for the same input. An LLM answer to this question varies by temperature and phrasing. Regex is 100% deterministic, zero cost, and produces an exact match list. Logo detection via template match is explainable: here is the confidence score, here is the region where the match was found.
@@ -82,7 +82,7 @@ Brand compliance must be auditable and reproducible. "Does this image contain a 
 CLIP measures cosine similarity between the image embedding and the prompt text. It answers "does the image look like the prompt?" not "does the image match the brand brief?" A photorealistic image of a competitor's product would score high on CLIP if the prompt mentioned the product category. CLIP is a useful complementary signal but does not replace brand-aware scoring. Added to the production roadmap, not implemented in POC.
 
 ### Why not human-only evaluation
-At 250 campaigns/month × 3 ratios × 5 products = 3,750 images/month, human review of every generated image at the generation stage is not viable. The quality loop automates the generation-time filter. Human review is reserved for the 10% weekly sample and for assets flagged after max attempts — where human judgment adds the most value.
+At 250 campaigns/month × 3 ratios × 5 products = 3,750 images/month, human review of every generated image at the generation stage is not viable. The quality loop automates the generation-time filter. Human review is reserved for the 10% weekly sample and for assets flagged after max attempts - where human judgment adds the most value.
 
 ---
 
@@ -98,14 +98,14 @@ A PIL-only approach requires two sequential steps:
 
 These are two independent decisions that can conflict: the vision model recommends "bottom-left" but the background there is too bright for white text. The PIL renderer does not know this.
 
-Gemini 3.1 Flash Image handles placement, typography, contrast treatment, and blending as **one holistic creative act** — the same way a designer would. It sees the whole image before deciding where to put the text. The result looks composed into the photo rather than stamped on top.
+Gemini 3.1 Flash Image handles placement, typography, contrast treatment, and blending as **one holistic creative act** - the same way a designer would. It sees the whole image before deciding where to put the text. The result looks composed into the photo rather than stamped on top.
 
 ### Why keep PIL as fallback
-The LLM overlay path has failure modes: API quota exhaustion, provider outages, safety filter rejections. Discarding the asset when the overlay fails is unacceptable — the image generation step costs ~$0.02. The PIL fallback guarantees an asset is always written. Quality is lower (static bottom gradient, no adaptive placement) but the run completes and the asset reaches the reviewer.
+The LLM overlay path has failure modes: API quota exhaustion, provider outages, safety filter rejections. Discarding the asset when the overlay fails is unacceptable - the image generation step costs ~$0.02. The PIL fallback guarantees an asset is always written. Quality is lower (static bottom gradient, no adaptive placement) but the run completes and the asset reaches the reviewer.
 
 ---
 
-## 5. Provider Selection — Single Google API Key
+## 5. Provider Selection - Single Google API Key
 
 ### Decision
 Use only `GOOGLE_API_KEY`. All four models (Imagen 4, Gemini 3 Flash, Gemini 3.1 Flash Lite, Gemini 3.1 Flash Image) share one key and one SDK.
@@ -122,12 +122,12 @@ Imagen 4 provides IP indemnification: Google's commercial usage policy covers th
 The pipeline uses the right model for each task rather than forcing every task through the most capable (and expensive) model:
 - Image synthesis needs a dedicated image model (Imagen 4), not a text model pretending to generate images
 - Quality scoring needs vision capability (Gemini 3 Flash), not text-only
-- Prompt rewriting and safety classification are text tasks where speed matters more than power (Gemini 3.1 Flash Lite — ~5× cheaper than Flash)
+- Prompt rewriting and safety classification are text tasks where speed matters more than power (Gemini 3.1 Flash Lite - ~5× cheaper than Flash)
 - Text overlay needs image-in → image-out (Gemini 3.1 Flash Image), not just a chat response
 
 ---
 
-## 6. Parallel Execution — Per-Ratio ThreadPoolExecutor
+## 6. Parallel Execution - Per-Ratio ThreadPoolExecutor
 
 ### Decision
 Process products sequentially, resize and overlay each aspect ratio in parallel per product.
@@ -138,7 +138,7 @@ Process products sequentially, resize and overlay each aspect ratio in parallel 
 - The expensive step (Imagen 4 generation) is one call per product regardless, parallelising it does not reduce API cost
 
 ### Why parallel at the ratio level
-The three ratios (1:1, 9:16, 16:9) for a single product are completely independent after resize — no shared state, no write conflict (each writes to a different output path). Running them concurrently cuts composition wall-clock time by ~3×. `ThreadPoolExecutor` with `as_completed` and per-future exception handling means one ratio failing does not cancel the others.
+The three ratios (1:1, 9:16, 16:9) for a single product are completely independent after resize - no shared state, no write conflict (each writes to a different output path). Running them concurrently cuts composition wall-clock time by ~3×. `ThreadPoolExecutor` with `as_completed` and per-future exception handling means one ratio failing does not cancel the others.
 
 ### Production path
 At 250 campaigns/month and multiple concurrent users, product-level parallelism is needed. The production design assigns disjoint product subsets to Kubernetes workers (one worker per product, or per campaign) with Redis preventing concurrent writes to the same output path. See FUTURE_SCOPE.md.
@@ -153,47 +153,47 @@ Before any API call for a given ratio, check whether the output file already exi
 ### Why file-based idempotency
 - Zero infrastructure dependency: no database, no Redis, no external state
 - Correct for the single-user sequential CLI model
-- Makes re-runs after crashes or partial failures trivially safe — only missing outputs are rebuilt
+- Makes re-runs after crashes or partial failures trivially safe - only missing outputs are rebuilt
 - Consistent with how creative teams think: "does this output file exist?" is the natural question
 
 ### Why not hash-based idempotency
-A hash-based system (store SHA-256 of brief + product + region → output path) would detect when the brief has changed and invalidate stale outputs. The current file check does not — if the brief message changes, existing output files are silently reused. This is documented in FUTURE_SCOPE.md (Brief Manifest for Idempotency) as the production fix.
+A hash-based system (store SHA-256 of brief + product + region → output path) would detect when the brief has changed and invalidate stale outputs. The current file check does not - if the brief message changes, existing output files are silently reused. This is documented in FUTURE_SCOPE.md (Brief Manifest for Idempotency) as the production fix.
 
 ### Production risk
-If two workers attempt to write the same output path simultaneously, the file-existence check is not atomic. Worker A checks (file missing), Worker B checks (file missing), both generate, both write — last writer wins, one API call wasted. The production fix is Redis SETNX keyed on `{campaign_id}:{product}:{region}:{ratio}` before the check. Not needed at POC scale (sequential CLI, single user).
+If two workers attempt to write the same output path simultaneously, the file-existence check is not atomic. Worker A checks (file missing), Worker B checks (file missing), both generate, both write - last writer wins, one API call wasted. The production fix is Redis SETNX keyed on `{campaign_id}:{product}:{region}:{ratio}` before the check. Not needed at POC scale (sequential CLI, single user).
 
 ---
 
-## 8. LangGraph Checkpointing — MemorySaver
+## 8. LangGraph Checkpointing - MemorySaver
 
 ### Decision
 Use LangGraph `MemorySaver` for quality loop checkpointing.
 
 ### What it provides
-After each node completes (build_prompt → generate → evaluate → refine), LangGraph saves the full state to an in-process dictionary. If the evaluator throws an exception after Imagen 4 has already returned an image, re-invoking the graph with the same `thread_id` resumes from the evaluate node — the image is loaded from the checkpoint, not regenerated.
+After each node completes (build_prompt → generate → evaluate → refine), LangGraph saves the full state to an in-process dictionary. If the evaluator throws an exception after Imagen 4 has already returned an image, re-invoking the graph with the same `thread_id` resumes from the evaluate node - the image is loaded from the checkpoint, not regenerated.
 
 ### Limitation
-`MemorySaver` is in-process only. A process kill (OOM, Kubernetes pod eviction, machine restart) loses all checkpoint state. On restart, the quality loop begins from scratch — one Imagen 4 credit wasted per interrupted product.
+`MemorySaver` is in-process only. A process kill (OOM, Kubernetes pod eviction, machine restart) loses all checkpoint state. On restart, the quality loop begins from scratch - one Imagen 4 credit wasted per interrupted product.
 
 ### Why not SqliteSaver or PostgresSaver now
-`SqliteSaver` requires a database path; `PostgresSaver` requires a connection string and a running database. For a single-user CLI POC, adding a database dependency would not be evaluated and would complicate the setup. The in-process `MemorySaver` is correct for the POC scope. The migration path is one constructor swap — documented in FUTURE_SCOPE.md.
+`SqliteSaver` requires a database path, `PostgresSaver` requires a connection string and a running database. For a single-user CLI POC, adding a database dependency would not be evaluated and would complicate the setup. The in-process `MemorySaver` is correct for the POC scope. The migration path is one constructor swap - documented in FUTURE_SCOPE.md.
 
 ---
 
-## 9. Compliance — Deterministic Rules, Not LLM
+## 9. Compliance - Deterministic Rules, Not LLM
 
 ### Decision
 Brand compliance is checked with three deterministic rules: logo template match, brand color histogram comparison, prohibited word regex. No LLM is involved in compliance gating.
 
 ### Why deterministic
-Compliance is a hard gate — an asset either passes or it does not, and the decision must be reproducible. "Does this image contain the word 'guaranteed'?" must always be the same answer. An LLM answer to this question can vary between calls. For auditable brand governance, deterministic checks are the correct choice.
+Compliance is a hard gate - an asset either passes or it does not, and the decision must be reproducible. "Does this image contain the word 'guaranteed'?" must always be the same answer. An LLM answer to this question can vary between calls. For auditable brand governance, deterministic checks are the correct choice.
 
 ### What deterministic compliance cannot catch
-Semantic brand alignment — "does this image feel like our brand?" — is not expressible as a rule. This is handled by the LangGraph quality loop (Gemini 3 Flash score), not by the compliance checker. The two mechanisms are complementary, not redundant.
+Semantic brand alignment - "does this image feel like our brand?" - is not expressible as a rule. This is handled by the LangGraph quality loop (Gemini 3 Flash score), not by the compliance checker. The two mechanisms are complementary, not redundant.
 
 ---
 
-## 10. Region Message Adaptation — LLM Generation + Validation
+## 10. Region Message Adaptation - LLM Generation + Validation
 
 ### Decision
 When `message_override` is not set in the brief, Gemini 3.1 Flash Lite adapts `brief.message` for the region's language and cultural context. The adapted message is validated against `prohibited_words` and injection patterns before use. Failure falls back to `brief.message`.
@@ -202,7 +202,7 @@ When `message_override` is not set in the brief, Gemini 3.1 Flash Lite adapts `b
 At 10 regions × 50 campaigns, writing 500 manual override strings per quarter is not scalable. LLM adaptation generates culturally appropriate copy automatically. The human override field remains available for markets where exact copy control is required.
 
 ### Why validate the generated message
-The LLM controls the output but does not know the brand's prohibited word list. Without validation, it could produce a message containing a prohibited term (e.g. "guaranteed" in German = "garantiert") which would cause downstream compliance failure and a wasted overlay call. Validation before the overlay step catches this class of error early. Security injection check is also applied — though the risk of the adaptation prompt itself being injected is low, defense-in-depth is correct practice.
+The LLM controls the output but does not know the brand's prohibited word list. Without validation, it could produce a message containing a prohibited term (e.g. "guaranteed" in German = "garantiert") which would cause downstream compliance failure and a wasted overlay call. Validation before the overlay step catches this class of error early. Security injection check is also applied - though the risk of the adaptation prompt itself being injected is low, defense-in-depth is correct practice.
 
 ### Why Gemini 3.1 Flash Lite, not Flash
-Message adaptation is a short-text translation and cultural rewriting task — no vision, no complex reasoning. Flash Lite is ~5× cheaper, under 1s latency, and produces equivalent output for this task. Cost matters when this call runs once per region per product per campaign.
+Message adaptation is a short-text translation and cultural rewriting task - no vision, no complex reasoning. Flash Lite is ~5× cheaper, under 1s latency, and produces equivalent output for this task. Cost matters when this call runs once per region per product per campaign.

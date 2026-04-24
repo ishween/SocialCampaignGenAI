@@ -47,10 +47,10 @@ Every generated image passes through structural checks before composition procee
 | Check | Threshold | On failure |
 |---|---|---|
 | Resolution | Long edge ≥ 1024px | Regenerate via quality loop (up to max attempts) |
-| File size | 100 KB – 15 MB | Regenerate if too small; log if suspiciously large |
+| File size | 100 KB – 15 MB | Regenerate if too small, log if suspiciously large |
 | Not blank | Pixel standard deviation > 10 | Regenerate |
-| Provider safety | Not flagged by Imagen 4 built-in filter | Discard; do not regenerate with same prompt |
-| Quality score (LangGraph loop) | Gemini 3 Flash score ≥ configured threshold (0-5 scale) | Refine prompt and regenerate; flag for human review after max attempts |
+| Provider safety | Not flagged by Imagen 4 built-in filter | Discard, do not regenerate with same prompt |
+| Quality score (LangGraph loop) | Gemini 3 Flash score ≥ configured threshold (0-5 scale) | Refine prompt and regenerate, flag for human review after max attempts |
 
 ### What is checked by humans (weekly sample)
 

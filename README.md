@@ -15,7 +15,7 @@ flowchart TD
     ASSET -- Yes --> LOAD[Load photo from disk]
     ASSET -- No --> QLOOP
 
-    subgraph QLOOP[LangGraph Quality Loop — stateful, checkpointed]
+    subgraph QLOOP[LangGraph Quality Loop - stateful, checkpointed]
         direction TB
         GEN[Imagen 4\ngenerate image] --> EVAL[Gemini 3 Flash\nscore 0–5]
         EVAL --> OK{score ≥\nthreshold?}
@@ -29,7 +29,7 @@ flowchart TD
     ACCEPT --> FOCAL
 
     FOCAL[Gemini 3 Flash\ndetect focal point]
-    FOCAL --> RESIZE[Smart crop → 1:1 · 9:16 · 16:9\nThreadPoolExecutor — parallel]
+    FOCAL --> RESIZE[Smart crop → 1:1 · 9:16 · 16:9\nThreadPoolExecutor - parallel]
 
     RESIZE --> REGION[For each region]
 
@@ -43,10 +43,10 @@ flowchart TD
     MSGREADY --> RATIO
     FALLBACK --> RATIO
 
-    subgraph RATIO[Per image format — parallel, fault-isolated]
+    subgraph RATIO[Per image format - parallel, fault-isolated]
         direction TB
         IDEM{Output already\non disk?}
-        IDEM -- Yes --> SKIP[SKIP — show in summary]
+        IDEM -- Yes --> SKIP[SKIP - show in summary]
         IDEM -- No --> OVR{Gemini 3.1 Flash Image\nLLM overlay available?}
         OVR -- Yes --> LLM[Add campaign text\nplacement · typography · contrast]
         OVR -- No --> PIL[PIL fallback\ngradient vignette + text]
@@ -73,7 +73,7 @@ flowchart TD
 ### Prerequisites
 
 - Python 3.11 or higher
-- `GOOGLE_API_KEY` — one key covers all four models (Imagen 4, Gemini 3 Flash, Gemini 3.1 Flash Lite, Gemini 3.1 Flash Image)
+- `GOOGLE_API_KEY` - one key covers all four models (Imagen 4, Gemini 3 Flash, Gemini 3.1 Flash Lite, Gemini 3.1 Flash Image)
 
 ### Installation
 
@@ -110,7 +110,7 @@ echo 'GOOGLE_API_KEY=your-key-here' > .env
 
 | Argument | Required | Default | Description |
 |---|---|---|---|
-| `--brief` | Yes | — | Path to campaign brief YAML. |
+| `--brief` | Yes | - | Path to campaign brief YAML. |
 | `--output` | No | `./output` | Output directory. Created automatically. |
 | `--assets` | No | `./assets/input` | Directory scanned for existing product images. |
 | `--brand-config` | No | `./config/brand_config.yaml` | Brand colors, logo, font, prohibited words. |
@@ -150,9 +150,9 @@ regions:
     locale_name: "United States"
 
 aspect_ratios:
-  - "1:1"    # 1080 × 1080 — Instagram feed, Facebook
-  - "9:16"   # 1080 × 1920 — Stories, TikTok, Reels
-  - "16:9"   # 1920 × 1080 — YouTube, display banners
+  - "1:1"    # 1080 × 1080 - Instagram feed, Facebook
+  - "9:16"   # 1080 × 1920 - Stories, TikTok, Reels
+  - "16:9"   # 1920 × 1080 - YouTube, display banners
 
 prohibited_words:
   - "guaranteed"
@@ -224,9 +224,9 @@ text_shadow: true
 
 | Field | Type | Description |
 |---|---|---|
-| `logo_path` | string | PNG with transparency; checked in compliance step |
-| `primary_colors` | list[hex] | Brand palette; ≥ 15% pixel coverage required to pass compliance |
-| `font_path` | string \| null | TTF/OTF for PIL fallback overlay; null = system font |
+| `logo_path` | string | PNG with transparency, checked in compliance step |
+| `primary_colors` | list[hex] | Brand palette, ≥ 15% pixel coverage required to pass compliance |
+| `font_path` | string \| null | TTF/OTF for PIL fallback overlay, null = system font |
 | `text_color` | hex | Overlay text color for PIL fallback |
 | `text_shadow` | bool | Multi-layer drop shadow behind text for readability |
 
@@ -259,7 +259,7 @@ All models share a single `GOOGLE_API_KEY`. The pipeline uses the right-sized mo
 | Task | Model | Notes |
 |---|---|---|
 | Image generation | Imagen 4 (`imagen-4.0-generate-001`) | Dedicated synthesis model, not a general LLM. Chosen for IP indemnification and photorealism. ~$0.02/image. |
-| Quality scoring + focal point detection | Gemini 3 Flash (`gemini-3-flash-preview`) | Vision input → numeric score (0–5) + pixel coordinates. Multimodal; fast enough for up to 3 evaluation rounds per product. |
+| Quality scoring + focal point detection | Gemini 3 Flash (`gemini-3-flash-preview`) | Vision input → numeric score (0–5) + pixel coordinates. Multimodal, fast enough for up to 3 evaluation rounds per product. |
 | Prompt refinement · safety classification · region message adaptation | Gemini 3.1 Flash Lite (`gemini-3.1-flash-lite-preview`) | Text-only tasks needing speed over power. ~5× cheaper than Flash. Right-sized for binary classification and short-text rewriting. |
 | LLM text overlay | Gemini 3.1 Flash Image (`gemini-3.1-flash-image-preview`) | Image-in → image-out. Adds campaign text as one holistic creative decision, with placement, typography, and contrast handled together rather than in separate steps. |
 
@@ -276,7 +276,7 @@ All models share a single `GOOGLE_API_KEY`. The pipeline uses the right-sized mo
 | Each image format runs independently | 1:1, 9:16, and 16:9 each run in separate parallel threads. A failure in one format does not cancel the others. Partial output is accepted. |
 | Save immediately | Each creative is written to disk right after overlay and compliance complete, not at the end of the run. A crash mid-run leaves all previously completed formats intact. |
 | Idempotency | If an output file already exists on disk, all API calls for that creative are skipped. Re-running after a crash only rebuilds what is missing. Shown as `[SKIP]` in the summary. |
-| LLM overlay → PIL fallback | When Gemini image editing fails (429, 5xx, empty response), PIL gradient vignette + text is applied in code. The asset is still written; visual quality is lower but the run completes. |
+| LLM overlay → PIL fallback | When Gemini image editing fails (429, 5xx, empty response), PIL gradient vignette + text is applied in code. The asset is still written, visual quality is lower but the run completes. |
 | LangGraph MemorySaver | If the quality evaluator crashes after Imagen 4 has already generated an image, resuming the pipeline reloads the image from the in-process checkpoint rather than calling Imagen 4 again. |
 | Region message validation | If LLM-adapted copy contains a prohibited word or injection pattern, it is discarded and the original brief message is used. The asset is never blocked by bad auto-generated copy. |
 

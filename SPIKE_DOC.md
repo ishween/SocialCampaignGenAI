@@ -50,14 +50,14 @@ Currently the pipeline writes to the local filesystem (`output/{product}/{region
 
 | Question | Answer | Implication |
 |---|---|---|
-| How many campaigns per month? | ~250 campaigns/month | ~8-10 campaigns/day; batch cadence is appropriate |
+| How many campaigns per month? | ~250 campaigns/month | ~8-10 campaigns/day, batch cadence is appropriate |
 | How many products per campaign? | 2-5 products | Max ~1,250 product+campaign combinations/month |
 | How many aspect ratios per product? | 3 (1:1, 9:16, 16:9) | Max ~3,750 generated assets/month |
 | How many regions per campaign? | Typically 1-3 | At 3 regions × 3 ratios × 5 products: 45 assets/campaign |
 | Who are the users? | 5-20 creative team members | No multi-tenancy required at POC scale |
 | What is acceptable end-to-end latency? | 5-10 min for a full batch campaign | Async/queue not required for POC |
 | What notification mechanism is needed? | CLI output in POC | Webhooks or email in production |
-| What availability SLA is expected? | Best-effort for POC; **99.5%** for production | Appropriate for a batch creative tool where campaigns are planned days in advance and the system is not customer-facing real-time |
+| What availability SLA is expected? | Best-effort for POC, **99.5%** for production | Appropriate for a batch creative tool where campaigns are planned days in advance and the system is not customer-facing real-time |
 | Does the pipeline need to be idempotent? | Yes. Re-runs should not regenerate existing assets. | Asset existence check is a first-class requirement |
 | What happens when an image is off-brand? | Fail fast with clear error. Do not overwrite reviewed assets. | Compliance check gates file write |
 
@@ -119,23 +119,23 @@ Currently the pipeline writes to the local filesystem (`output/{product}/{region
 flowchart TD
     CLI([CLI Invocation\n--brief campaign.yaml]) --> SEC
 
-    SEC[Security Validation\nsrc/security/input_validator.py\nLayer 1 — Regex blocklist\nLayer 2 — Gemini 3.1 Flash Lite classifier]
+    SEC[Security Validation\nsrc/security/input_validator.py\nLayer 1 - Regex blocklist\nLayer 2 - Gemini 3.1 Flash Lite classifier]
 
     SEC --> CFG
 
-    CFG[Config Layer\nsrc/config/parser.py — loads and validates YAML\nsrc/config/models.py — Pydantic schema\nOutputs: CampaignBrief · BrandConfig]
+    CFG[Config Layer\nsrc/config/parser.py - loads and validates YAML\nsrc/config/models.py - Pydantic schema\nOutputs: CampaignBrief · BrandConfig]
 
     CFG --> RUN[Pipeline Runner\nsrc/pipeline/runner.py\nFor each product × region]
 
     RUN --> PHASE1
 
-    subgraph PHASE1[Phase 1 — Asset Resolution]
+    subgraph PHASE1[Phase 1 - Asset Resolution]
         direction TB
         ASSET{existing_asset\nset in YAML?}
         ASSET -- Yes --> LOAD[Load photo from disk]
         ASSET -- No --> QLOOP
 
-        subgraph QLOOP[LangGraph Quality Loop — stateful, checkpointed]
+        subgraph QLOOP[LangGraph Quality Loop - stateful, checkpointed]
             direction TB
             GEN[Imagen 4\ngenerate image] --> EVAL[Gemini 3 Flash\nscore 0–5 + written feedback]
             EVAL --> SCORE{score ≥\nthreshold?}
@@ -151,16 +151,16 @@ flowchart TD
 
     MSG[Resolve campaign message per region\n① YAML override  ② LLM-adapted  ③ brief message]
 
-    MSG --> FOCAL[Detect subject focal point\nGemini 3 Flash — identifies visual centre\nCoordinates used only for crop guidance]
+    MSG --> FOCAL[Detect subject focal point\nGemini 3 Flash - identifies visual centre\nCoordinates used only for crop guidance]
 
     FOCAL --> RESIZE[Smart crop to each ratio in parallel\n1:1 · 9:16 · 16:9 via ThreadPoolExecutor\nsrc/composition/resizer.py]
 
     RESIZE --> RATIO
 
-    subgraph RATIO[Per-ratio — 1:1 · 9:16 · 16:9 — overlay and save run in parallel, fault-isolated]
+    subgraph RATIO[Per-ratio - 1:1 · 9:16 · 16:9 - overlay and save run in parallel, fault-isolated]
         direction TB
         IDEM{Output file\nalready on disk?}
-        IDEM -- Yes --> SKIP[SKIP — show in summary]
+        IDEM -- Yes --> SKIP[SKIP - show in summary]
         IDEM -- No --> MSGSET{Campaign\nmessage set?}
         MSGSET -- No --> LOGO[Add logo only]
         MSGSET -- Yes --> OVR{LLM overlay\nAPI call succeeds?}
@@ -197,7 +197,7 @@ The quality loop is not a retry mechanism for API errors. It is an iterative cre
 **Focal point detection: image crop only**
 Gemini 3 Flash detects the visual centre of the product image (e.g., the focal point of a bottle on a table). These coordinates are used exclusively to guide the smart crop, so that when the image is resized to 9:16 or 16:9, the product stays centred rather than being cropped out. Focal point detection has no connection to campaign message resolution. The campaign message is resolved separately from the YAML brief or via LLM adaptation.
 
-**Per-ratio — resize and overlay in parallel**
+**Per-ratio - resize and overlay in parallel**
 After the focal-point-guided crop produces a sized image for each ratio (1:1, 9:16, 16:9), all three ratios' overlay, compliance, and save steps run concurrently in separate threads. A failure in one ratio (e.g., the 9:16 LLM overlay times out) does not affect the 1:1 or 16:9 results. Partial output is accepted.
 
 **LLM overlay: what "API call succeeds" means**
