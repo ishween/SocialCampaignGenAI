@@ -323,7 +323,20 @@ Two fundamentally different evaluation approaches apply: exact assertions for de
 
 ## 9. Path to Production
 
-The following table covers both the capability gaps (what is needed to go from POC to production) and the key architectural trade-offs made in the POC. Items marked *POC choice* are deliberate simplifications. Each has a documented production alternative.
+The following subsections and table cover both the capability gaps (what is needed to go from POC to production).
+
+### 9.1 Packaging, versioning, and release discipline
+
+Reproducible packaging and version discipline so installs and deploys stay aligned without manual guesswork.
+
+| Component | Role |
+|---|---|
+| `pyproject.toml` | Single source of truth for project metadata, dependency declarations, and tool configuration (ruff, pytest, build backends)—the standard layout for a distributable Python package. |
+| `uv.lock` | Lockfile that pins the full resolved dependency tree. Commit it alongside the manifest: `uv sync` (or `uv run`) reproduces the same environment in CI, on servers, and on each developer machine. |
+| Pre-commit (git hooks) | Hooks that run on commit (format, lint, type checks, or lockfile validation) so broken dependencies and style drift are caught before they reach shared branches. |
+| Docker | Container images built from the same `pyproject.toml` / `uv.lock` (or a multi-stage build that runs `uv sync`) give identical runtime behavior in build pipelines and production—no drift from ad-hoc `pip install` on servers. |
+
+### 9.2 Capability and architecture gaps
 
 | Capability / Decision | POC | Production |
 |---|---|---|
@@ -346,7 +359,7 @@ The following table covers both the capability gaps (what is needed to go from P
 | Persistent checkpointing | `MemorySaver` (in-process only) | `SqliteSaver` / `PostgresSaver` for cross-process LangGraph state |
 | API key management | Environment variables | Secrets Manager |
 | Image format | PNG | PNG → WebP/JPEG pipeline at delivery |
-| Availability | Best-effort | 99.5% SLA |
+| Availability | Best-effort | 99.95% SLA |
 | Concurrency | Single user | 20 concurrent users via queue |
 | Cost controls | None | Per-tenant budget caps, rate limiting |
 | Dependency locking | `requirements.txt` | Private artifact registry + CVE scanning |
