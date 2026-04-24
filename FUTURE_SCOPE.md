@@ -95,4 +95,5 @@ Items deliberately deferred from the POC to keep scope and cost bounded. Each is
 **Why it matters:** Users want to check YAML correctness before committing to a pipeline run that consumes API credits. Currently, a malformed YAML is caught at startup before any API calls, but there is no easy way to test a new brief without triggering the full pipeline. A validate-only mode costs nothing and gives the creative operations team confidence before scheduling a campaign run.
 
 **What is needed:** Add `--validate-only` to the CLI argument parser. Route it to a function that runs only the config loading, Pydantic validation, and input security classification steps, then exits with code 0 on success or code 1 with field-level error messages on failure. No image generation or file I/O.
+
 ---
