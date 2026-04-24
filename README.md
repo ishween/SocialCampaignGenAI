@@ -78,8 +78,8 @@ flowchart TD
 ### Installation
 
 ```bash
-git clone https://github.com/ishween/GenAISocialAdCampaigns-.git
-cd GenAISocialAdCampaigns-
+git clone https://github.com/ishween/SocialCampaignGenAI.git
+cd SocialCampaignGenAI
 
 python -m venv .venv
 source .venv/bin/activate        # macOS / Linux
