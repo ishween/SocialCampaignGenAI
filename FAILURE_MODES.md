@@ -148,7 +148,3 @@ Cascading API failures - where every product in a campaign hits the same provide
 | FM-18 | Composition | Per-ratio overlay failure | Low | Low | P4 | Yes - other ratios continue |
 | FM-19 | Scale | Concurrent write conflict | Not applicable (POC) | Medium | P2 | Future - Redis lock |
 | FM-20 | Scale | Cascading API failures | Low | High | P1 | Future - circuit breaker |
-
----
-
-*Update this registry after each incident or test run that reveals a new failure mode.*
