@@ -305,7 +305,7 @@ The fault-tolerance mechanisms below are all implemented. See the `README.md` Fa
 
 ## 7. Evaluation Approach
 
-Two fundamentally different evaluation approaches apply: exact assertions for deterministic steps, and quality gates for generative steps. See **[`04_EVALUATION_STRATEGY.md`](04_EVALUATION_STRATEGY.md)** for the full tier structure, human review rubric, and pass thresholds.
+Two fundamentally different evaluation approaches apply: exact assertions for deterministic steps, and quality gates for generative steps. See **[`EVALUATION_STRATEGY.md`](EVALUATION_STRATEGY.md)** for the full tier structure, human review rubric, and pass thresholds.
 
 | Tier | Frequency | What is evaluated |
 |---|---|---|

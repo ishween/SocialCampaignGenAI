@@ -254,7 +254,7 @@ output/
 
 ## AI Models
 
-All models share a single `GOOGLE_API_KEY`. The pipeline uses the right-sized model for each task rather than routing everything through the most capable (and expensive) model. Image synthesis needs a dedicated generation model, quality evaluation needs multimodal vision, and text-only tasks like prompt refinement and safety classification need speed over power. See `TradeOff.md §5` for the full provider and model selection rationale.
+All models share a single `GOOGLE_API_KEY`. The pipeline uses the right-sized model for each task rather than routing everything through the most capable (and expensive) model. Image synthesis needs a dedicated generation model, quality evaluation needs multimodal vision, and text-only tasks like prompt refinement and safety classification need speed over power. See `Trade_OFF.md` §5 for the full provider and model selection rationale.
 
 | Task | Model | Notes |
 |---|---|---|
@@ -286,8 +286,8 @@ All models share a single `GOOGLE_API_KEY`. The pipeline uses the right-sized mo
 
 | Document | Description |
 |---|---|
-| [TradeOff.md](TradeOff.md) | Every major design decision with alternatives considered and reasons for the choice |
-| [Spike_doc.md](Spike_doc.md) | Full design doc: architecture, model selection, prompt strategy, fault tolerance |
+| [Trade_OFF.md](Trade_OFF.md) | Every major design decision with alternatives considered and reasons for the choice |
+| [SPIKE_DOC.md](SPIKE_DOC.md) | Full design doc: architecture, model selection, prompt strategy, fault tolerance |
 | [FUTURE_SCOPE.md](FUTURE_SCOPE.md) | 11 production items deferred from POC (retry, persistent checkpointing, DAM integration, etc.) |
-| [03_FAILURE_MODES.md](03_FAILURE_MODES.md) | Failure classification, handling flowchart, failure mode registry |
-| [04_EVALUATION_STRATEGY.md](04_EVALUATION_STRATEGY.md) | Evaluation tiers, human review rubric, business metrics baseline |
+| [FAILURE_MODES.md](FAILURE_MODES.md) | Failure classification, handling flowchart, failure mode registry |
+| [EVALUATION_STRATEGY.md](EVALUATION_STRATEGY.md) | Evaluation tiers, human review rubric, business metrics baseline |
