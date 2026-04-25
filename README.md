@@ -286,7 +286,7 @@ All models share a single `GOOGLE_API_KEY`. The pipeline uses the right-sized mo
 
 | Document | Description |
 |---|---|
-| [Trade_OFF.md](Trade_OFF.md) | Every major design decision with alternatives considered and reasons for the choice |
+| [Trade_Off.md](Trade_Off.md) | Every major design decision with alternatives considered and reasons for the choice |
 | [SPIKE_DOC.md](SPIKE_DOC.md) | Full design doc: architecture, model selection, prompt strategy, fault tolerance |
 | [FUTURE_SCOPE.md](FUTURE_SCOPE.md) | 11 production items deferred from POC (retry, persistent checkpointing, etc.) |
 | [FAILURE_MODES.md](FAILURE_MODES.md) | Failure classification, handling flowchart, failure mode registry |
